@@ -11,12 +11,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'Dota 2 Shopping List',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: const ShoppingListScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

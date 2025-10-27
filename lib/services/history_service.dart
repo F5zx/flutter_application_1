@@ -15,8 +15,6 @@ class HistoryService {
       return [];
     }
   }
-
-  // Добавить в историю
   Future<void> addToHistory(String newItem) async {
     try {
       newItem = newItem.trim().toLowerCase();

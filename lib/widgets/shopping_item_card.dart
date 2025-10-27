@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import '../models/shopping_item.dart';
+import '../models/app_theme.dart';
 
 class ShoppingItemCard extends StatelessWidget {
   final ShoppingItem item;
   final VoidCallback onToggle;
   final VoidCallback onDelete;
+  final AppTheme theme;
 
   const ShoppingItemCard({
     super.key,
     required this.item,
     required this.onToggle,
     required this.onDelete,
+    required this.theme,
   });
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -20,12 +24,12 @@ class ShoppingItemCard extends StatelessWidget {
         gradient: LinearGradient(
           colors: item.isCompleted
               ? [
-                  const Color(0xFF2a2a2a),
-                  const Color(0xFF1a1a1a),
+                  theme.cardColor,
+                  theme.backgroundColor,
                 ]
               : [
-                  const Color(0x1Ad32f2f),
-                  const Color(0xFF1a1a1a),
+                  theme.primaryColor.withOpacity(0.1),
+                  theme.cardColor,
                 ],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
@@ -34,7 +38,7 @@ class ShoppingItemCard extends StatelessWidget {
         border: Border.all(
           color: item.isCompleted
               ? Colors.grey[700]!
-              : const Color(0x4Dd32f2f),
+              : theme.primaryColor.withOpacity(0.3),
           width: 1,
         ),
         boxShadow: [
@@ -64,10 +68,10 @@ class ShoppingItemCard extends StatelessWidget {
         leading: Container(
           decoration: BoxDecoration(
             color: item.isCompleted 
-                ? const Color(0xFFd32f2f) 
+                ? theme.primaryColor 
                 : Colors.transparent,
             border: Border.all(
-              color: const Color(0xFFd32f2f),
+              color: theme.primaryColor,
               width: 2,
             ),
             borderRadius: BorderRadius.circular(4),
@@ -85,7 +89,7 @@ class ShoppingItemCard extends StatelessWidget {
         trailing: IconButton(
           icon: Icon(
             Icons.delete,
-            color: const Color(0xFFd32f2f),
+            color: theme.primaryColor,
             size: 24,
           ),
           onPressed: onDelete,

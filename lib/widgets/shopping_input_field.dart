@@ -1,21 +1,30 @@
 import 'package:flutter/material.dart';
+import '../models/app_theme.dart';
+import '../services/app_localizations.dart';
 
 class ShoppingInputField extends StatefulWidget {
   final TextEditingController controller;
   final Function(String) onItemAdded;
   final Function() onQuickPress;
+  final AppTheme theme;
+  final AppLocalizations localizations;
+
   const ShoppingInputField({
     super.key,
     required this.controller,
     required this.onItemAdded,
     required this.onQuickPress,
+    required this.theme,
+    required this.localizations,
   });
+
   @override
   State<ShoppingInputField> createState() => _ShoppingInputFieldState();
 }
 
 class _ShoppingInputFieldState extends State<ShoppingInputField> {
   final FocusNode _focusNode = FocusNode();
+  
   final List<DateTime> _pressTimes = [];
   static const int _maxQuickPresses = 7;
   static const int _timeWindowMs = 2000;
@@ -23,50 +32,53 @@ class _ShoppingInputFieldState extends State<ShoppingInputField> {
   void _checkQuickPress() {
     final now = DateTime.now();
     _pressTimes.add(now);
+    
     _pressTimes.removeWhere((time) => 
       now.difference(time).inMilliseconds > _timeWindowMs
     );
+    
     if (_pressTimes.length >= _maxQuickPresses) {
       _showFunnyDialog();
       _pressTimes.clear();
     }
   }
+
   void _showFunnyDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1a1a1a),
+          backgroundColor: widget.theme.cardColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Color(0xFFd32f2f), width: 2),
+            side: BorderSide(color: widget.theme.primaryColor, width: 2),
           ),
-          title: const Text(
-            'Эй, релок!',
+          title: Text(
+            widget.localizations.quickPressDialogTitle,
             style: TextStyle(
-              color: Color(0xFFd32f2f),
+              color: widget.theme.primaryColor,
               fontWeight: FontWeight.bold,
               fontSize: 20,
             ),
           ),
-          content: const Text(
-            'Хули ты нажимаешь? Я устал \n\nДавай не так быстро',
-            style: TextStyle(color: Colors.white70),
+          content: Text(
+            widget.localizations.quickPressDialogContent,
+            style: const TextStyle(color: Colors.white70),
           ),
           actions: [
             Container(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFd32f2f), Color(0xFFb71c1c)],
+                gradient: LinearGradient(
+                  colors: [widget.theme.primaryColor, widget.theme.secondaryColor],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: TextButton(
-                child: const Text(
-                  'Ладно, ладно',
-                  style: TextStyle(color: Colors.white),
+                child: Text(
+                  widget.localizations.okay,
+                  style: const TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -78,6 +90,7 @@ class _ShoppingInputFieldState extends State<ShoppingInputField> {
       },
     );
   }
+
   void _addItem() {
     final text = widget.controller.text.trim();
     if (text.isNotEmpty) {
@@ -86,15 +99,16 @@ class _ShoppingInputFieldState extends State<ShoppingInputField> {
       _checkQuickPress();
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [
-            Color(0xFF1a1a1a),
-            Color(0xFF0c0c0c),
+            widget.theme.cardColor,
+            widget.theme.backgroundColor,
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -115,13 +129,13 @@ class _ShoppingInputFieldState extends State<ShoppingInputField> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFFd32f2f).withAlpha(128),
+                  color: widget.theme.primaryColor.withAlpha(128),
                   width: 2,
                 ),
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                   colors: [
-                    Color(0xFF2a2a2a),
-                    Color(0xFF1a1a1a),
+                    widget.theme.cardColor,
+                    widget.theme.backgroundColor,
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -131,11 +145,11 @@ class _ShoppingInputFieldState extends State<ShoppingInputField> {
                 controller: widget.controller,
                 focusNode: _focusNode,
                 style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  hintText: 'Добавить товар',
-                  hintStyle: TextStyle(color: Colors.grey),
+                decoration: InputDecoration(
+                  hintText: widget.localizations.addItemHint,
+                  hintStyle: const TextStyle(color: Colors.grey),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
@@ -152,15 +166,15 @@ class _ShoppingInputFieldState extends State<ShoppingInputField> {
           const SizedBox(width: 12),
           Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFd32f2f), Color(0xFFb71c1c)],
+              gradient: LinearGradient(
+                colors: [widget.theme.primaryColor, widget.theme.secondaryColor],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFd32f2f).withAlpha(102),
+                  color: widget.theme.primaryColor.withAlpha(102),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),

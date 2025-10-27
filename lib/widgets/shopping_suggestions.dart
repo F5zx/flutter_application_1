@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
 import '../services/history_service.dart';
+import '../models/app_theme.dart';
 
 class ShoppingSuggestions extends StatefulWidget {
   final TextEditingController controller;
   final Function(String) onSuggestionSelected;
+  final AppTheme theme;
 
   const ShoppingSuggestions({
     super.key,
     required this.controller,
     required this.onSuggestionSelected,
+    required this.theme,
   });
+
   @override
   State<ShoppingSuggestions> createState() => _ShoppingSuggestionsState();
 }
+
 class _ShoppingSuggestionsState extends State<ShoppingSuggestions> {
   final HistoryService _historyService = HistoryService();
   List<String> _suggestions = [];
   bool _showSuggestions = false;
+
   @override
   void initState() {
     super.initState();
@@ -25,6 +31,7 @@ class _ShoppingSuggestionsState extends State<ShoppingSuggestions> {
 
   void _onTextChanged() async {
     final text = widget.controller.text.trim();
+    
     if (text.isEmpty) {
       setState(() {
         _showSuggestions = false;
@@ -32,30 +39,33 @@ class _ShoppingSuggestionsState extends State<ShoppingSuggestions> {
       });
       return;
     }
+
     try {
       final history = await _historyService.getHistory();
       final filtered = history
           .where((item) => item.toLowerCase().contains(text.toLowerCase()))
           .toList();
 
-      print('Найдено подсказок${filtered.length} для текста$text'); // Отладка
       setState(() {
         _suggestions = filtered;
         _showSuggestions = filtered.isNotEmpty;
       });
     } catch (e) {
-      print('Ошибка при поиске подсказок$e');
+      print('Ошибка при поиске подсказок: $e');
     }
   }
+
   String _capitalizeFirstLetter(String text) {
     if (text.isEmpty) return text;
     return text[0].toUpperCase() + text.substring(1);
   }
+
   @override
   void dispose() {
     widget.controller.removeListener(_onTextChanged);
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     if (!_showSuggestions) return const SizedBox.shrink();
@@ -66,11 +76,11 @@ class _ShoppingSuggestionsState extends State<ShoppingSuggestions> {
       bottom: 80,
       child: Material(
         elevation: 8.0,
-        color: const Color(0xFF1a1a1a),
+        color: widget.theme.cardColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(
-            color: Color(0xFFd32f2f),
+          side: BorderSide(
+            color: widget.theme.primaryColor,
             width: 2,
           ),
         ),
@@ -87,18 +97,18 @@ class _ShoppingSuggestionsState extends State<ShoppingSuggestions> {
               return Container(
                 decoration: BoxDecoration(
                   border: index < _suggestions.length - 1
-                      ? const Border(
+                      ? Border(
                           bottom: BorderSide(
-                            color: Color(0xFF2a2a2a),
+                            color: widget.theme.backgroundColor,
                             width: 1,
                           ),
                         )
                       : null,
                 ),
                 child: ListTile(
-                  leading: const Icon(
+                  leading: Icon(
                     Icons.history,
-                    color: Color(0xFFd32f2f),
+                    color: widget.theme.primaryColor,
                   ),
                   title: Text(
                     _capitalizeFirstLetter(suggestion),
